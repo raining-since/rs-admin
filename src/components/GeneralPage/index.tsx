@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
+import React, {useState} from 'react';
+import {PageContainer} from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
-import { BasePageProps } from '@/components/BasePage/type';
-import { GeneralEventType } from '@/components/GeneralPage/type';
-import { Button, Popconfirm, Space, Table } from 'antd';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons/lib';
+import {GeneralEventType, GenralPageProps} from '@/components/GeneralPage/type';
+import {Button, Popconfirm, Space} from 'antd';
+import {PlusOutlined,} from '@ant-design/icons/lib';
+import {
+  ModalForm, DrawerForm
+} from '@ant-design/pro-form';
 
 /*
 * 在 BasePage 基础之上添加标准的增删改查功能，标准化通用页面
@@ -33,92 +35,95 @@ import { DeleteOutlined, PlusOutlined } from '@ant-design/icons/lib';
 * */
 
 
-function GeneralPage<T>(props: BasePageProps<T>) {
+function GeneralPage<T>(props: GenralPageProps<T>) {
 
-  // const { selectRows, setSelectRows } = useState([]);
+  const [selectRows, setSelectRows] = useState([]);
+
 
   const tConfig: Record<string, any> = {
     rowKey: 'id',
     search: {
       labelWidth: 'auto',
     },
-    form: {
-      syncToUrl: (values: any, type: any) => {
-        if (type === 'get') {
-          return {
-            ...values,
-            created_at: [values.startTime, values.endTime],
-          };
-        }
-        return values;
-      },
-    },
     pagination: {
       pageSize: 5,
     },
     headerTitle: '',
     dateFormatter: 'string',
-    toolBarRender: () => [
-      <Button key="button" icon={<PlusOutlined/>} type="primary">新建</Button>,
-    ],
-    rowSelection: {
-      selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+    toolBarRender: () => {
+      return props.formType === 'Model' ? <ModalForm<T>
+        title={`新建${props.prefix}`}
+        trigger={
+          <Button type="primary">
+            <PlusOutlined/>
+            新建
+          </Button>
+        }
+        onFinish={async (values) => {
+          await props.looper.looper(GeneralEventType.ADD, values)
+          return true;
+        }}
+      >
+        {props.formRender ? props.formRender() : ""}
+      </ModalForm> : <DrawerForm<T>
+        title={`新建${props.prefix}`}
+        trigger={
+          <Button type="primary">
+            <PlusOutlined/>
+            新建
+          </Button>
+        }
+        onFinish={async (values) => {
+          await props.looper.looper(GeneralEventType.ADD, values)
+          return true;
+        }}
+      >
+        {props.formRender ? props.formRender() : ""}
+
+      </DrawerForm>
     },
-    tableAlertRender: ({ selectedRowKeys, selectedRows, onCleanSelected }: any) => (
-      <Space size={24}>
-          <span>
-            已选 {selectedRowKeys.length} 项
-            <a style={{ marginLeft: 8 }} onClick={onCleanSelected}>
-              取消选择
-            </a>
-          </span>
+    rowSelection: {
+      onChange: (selectedRowKeys: any) => {
+        setSelectRows(selectedRowKeys)
+      },
+    },
+    tableAlertRender: ({selectedRowKeys, selectedRows, onCleanSelected}: any) => {
+      return <Space size={24}>
+                <span>已选{selectedRowKeys.length}项
+                  <a style={{marginLeft: 8}}
+                     onClick={onCleanSelected}>
+                    取消选择
+                  </a>
+                </span>
       </Space>
-    ),
+    },
     tableAlertOptionRender: () => {
       return (
         <Popconfirm
           title="确定删除所选项吗？"
           okText="删除"
-          onConfirm={() => props.looper.looper(GeneralEventType.DELETES, '')}
+          onConfirm={() => props.looper.looper(GeneralEventType.DELETES, selectRows)}
           cancelText="取消">
           <Button danger
-                  style={{ marginLeft: '20px' }}
+                  type="link"
+                  style={{marginLeft: '20px'}}
           >
-            <DeleteOutlined/>
             删除选择
           </Button>
         </Popconfirm>
       );
     },
+    request: async (params: any) => {
+      return props.looper.looper(GeneralEventType.SEARCH, params);
+    }
   };
 
-
-  props.tableConfig.columns.push({
-    title: '操作',
-    valueType: 'option',
-    render: (text: string, record: any, _: any, action: any) => [
-      <a
-        key="editable"
-        onClick={() => {
-          action.startEditable?.(record.id);
-        }}
-      >
-        修改
-      </a>,
-      <a href={record.url} target="_blank" rel="noopener noreferrer" key="view">
-        删除
-      </a>,
-    ],
-  });
 
   return <PageContainer
     {...props.pageConfig}>
     <ProTable<T>
       {...tConfig}
       {...props.tableConfig}
-      request={async (params) => {
-        return props.looper.looper(GeneralEventType.SEARCH, params);
-      }}
     />
     {props.children}
   </PageContainer>;

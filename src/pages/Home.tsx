@@ -1,11 +1,11 @@
 import React from 'react';
 import GeneralPage from '@/components/GeneralPage';
-import { PageContainerProps } from '@ant-design/pro-layout';
-import { ProColumns } from '@ant-design/pro-table';
-import { Space, Tag } from 'antd';
-import { createInstance } from '@/utils/utils';
+import {PageContainerProps} from '@ant-design/pro-layout';
+import {ProColumns} from '@ant-design/pro-table';
+import {Space, Tag} from 'antd';
+import {createInstance} from '@/utils/utils';
 import request from 'umi-request';
-import { GeneralEventType, GeneralLooper } from '@/components/GeneralPage/type';
+import {GeneralEventType, GeneralLooper} from '@/components/GeneralPage/type';
 
 type GithubIssueItem = {
   url: string;
@@ -26,6 +26,7 @@ type GithubIssueItem = {
 class MyAdapter implements GeneralLooper {
   looper(type: string, params: any): any {
     console.log(type);
+    console.log(params);
     if (type == GeneralEventType.SEARCH) {
       return request<{
         data: GithubIssueItem[];
@@ -67,7 +68,7 @@ const columns: ProColumns<GithubIssueItem>[] = [
     onFilter: true,
     valueType: 'select',
     valueEnum: {
-      all: { text: '全部', status: 'Default' },
+      all: {text: '全部', status: 'Default'},
       open: {
         text: '未解决',
         status: 'Error',
@@ -87,40 +88,19 @@ const columns: ProColumns<GithubIssueItem>[] = [
     title: '标签',
     dataIndex: 'labels',
     search: false,
-    renderFormItem: (_, { defaultRender }) => {
+    renderFormItem: (_, {defaultRender}) => {
       return defaultRender(_);
     },
     render: (_, record) => (
       <Space>
-        {record.labels.map(({ name, color }) => (
+        {record.labels.map(({name, color}) => (
           <Tag color={color} key={name}>
             {name}
           </Tag>
         ))}
       </Space>
     ),
-  },
-  {
-    title: '创建时间',
-    key: 'showTime',
-    dataIndex: 'created_at',
-    valueType: 'date',
-    hideInSearch: true,
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'created_at',
-    valueType: 'dateRange',
-    hideInTable: true,
-    search: {
-      transform: (value) => {
-        return {
-          startTime: value[0],
-          endTime: value[1],
-        };
-      },
-    },
-  },
+  }
 ];
 
 const pageConfig: PageContainerProps = {
@@ -148,11 +128,13 @@ const tConfig: Record<string, any> = {
   columns: columns,
 };
 
-const HomePage: React.FC = ({ children }) => {
+const HomePage: React.FC = ({children}) => {
   return <GeneralPage<GithubIssueItem>
+    prefix="组件"
     pageConfig={pageConfig}
     tableConfig={tConfig}
     looper={adapter}
+    isOptions={true}
   >
     {children}
   </GeneralPage>;
