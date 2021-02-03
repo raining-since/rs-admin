@@ -22,23 +22,23 @@ abstract class GeneralLoopHandler implements BaseLooper {
   }
 
   async loadDataWithPage(params: any) {
-    return request.get(`/api/${this.path}/v1`, { params: params });
+    return request.get(`/api/v1/${this.path}`, { params: params });
   }
 
   async addData(params: any) {
-    return request.post(`/api/${this.path}/v1`, { data: params });
+    return request.post(`/api/v1/${this.path}`, { data: params });
   }
 
   async deleteData(params: any) {
-    return request.delete(`/api/${this.path}/v1/${params}`);
+    return request.delete(`/api/v1/${this.path}/${params}`);
   }
 
   async updataData(params: any) {
-    return request.put(`/api/${this.path}/v1`, { data: params });
+    return request.put(`/api/v1/${this.path}`, { data: params });
   }
 
   async deleteDataWithSelect(params: any) {
-    return request.delete(`/api/${this.path}/v1`, { data: params });
+    return request.delete(`/api/v1/${this.path}`, { data: params });
   }
 
 }

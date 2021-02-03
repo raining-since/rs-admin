@@ -2,10 +2,10 @@
  * request 网络请求工具
  * 更详细的 api 文档: https://github.com/umijs/umi-request
  */
-import {extend} from 'umi-request';
-import {notification} from 'antd';
-import BaseConfig from "../../config/request.config";
-import {queryCurrentByLocal} from "@/services/user";
+import { extend } from 'umi-request';
+import { notification } from 'antd';
+import BaseConfig from '../../config/request.config';
+import { queryCurrentByLocal } from '@/services/user';
 
 
 const codeMessage = {
@@ -27,10 +27,10 @@ const codeMessage = {
 };
 
 const errorHandler = (error: { response: Response }): Response => {
-  const {response} = error;
+  const { response } = error;
   if (response && response.status) {
     const errorText = codeMessage[response.status] || response.statusText;
-    const {status, url} = response;
+    const { status, url } = response;
 
     notification.error({
       message: `请求错误 ${status}: ${url}`,
@@ -51,23 +51,31 @@ const request = extend({
 });
 
 request.interceptors.request.use((url, options) => {
-  const user = queryCurrentByLocal()
+  const user = queryCurrentByLocal();
   if (user?.token != null) {
     // 获取初始状态的 token
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': user?.token
+      'Authorization': user?.token,
     };
     return {
       url: `${BaseConfig.BASE_URL}${url}`,
-      options: {...options, headers},
-    }
+      options: { ...options, headers },
+    };
   }
   return {
     url: `${BaseConfig.BASE_URL}${url}`,
-    options: {...options},
-  }
-})
+    options: { ...options },
+  };
+});
+
+request.use(async (ctx, next) => {
+  await next();
+  ctx.res = Object.assign(ctx.res, {
+    success: true,
+    data: ctx.res.records,
+  });
+});
 
 
 export default request;

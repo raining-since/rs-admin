@@ -2,7 +2,6 @@ import React from 'react';
 import GeneralPage from '@/components/GeneralPage';
 import { PageContainerProps } from '@ant-design/pro-layout';
 import { ProColumns } from '@ant-design/pro-table';
-import { Space, Tag } from 'antd';
 import { createInstance } from '@/utils/utils';
 import ProForm, {
   ProFormText,
@@ -19,111 +18,58 @@ import GeneralLoopHandler from '@/services/general_loop_handler';
 * 5. 表单组件配置
 * */
 
-type GithubIssueItem = {
-  url: string;
-  id: number;
-  number: number;
-  title: string;
-  labels: {
-    name: string;
-    color: string;
-  }[];
-  state: string;
-  comments: number;
-  created_at: string;
-  updated_at: string;
-  closed_at?: string;
-};
+export interface UserData extends API.GeneralData {
+  name: string
+  phone: string
+  password: string
+  account: string
+}
 
 class HomeAdapter extends GeneralLoopHandler {
-  path: string = '';
+  path: string = 'sysUser';
 }
 
 const adapter = createInstance(HomeAdapter);
 
-const columns: ProColumns<GithubIssueItem>[] = [
+const columns: ProColumns<UserData>[] = [
   {
-    dataIndex: 'index',
-    valueType: 'indexBorder',
-    width: 48,
-  },
-  {
-    title: '标题',
-    dataIndex: 'title',
-    copyable: true,
+    title: '名称',
+    dataIndex: 'name',
     ellipsis: true,
-    tip: '标题过长会自动收缩',
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '此项为必填项',
-        },
-      ],
-    },
-    width: '30%',
   },
   {
-    title: '状态',
-    dataIndex: 'state',
-    filters: true,
-    onFilter: true,
-    valueType: 'select',
-    valueEnum: {
-      all: { text: '全部', status: 'Default' },
-      open: {
-        text: '未解决',
-        status: 'Error',
-      },
-      closed: {
-        text: '已解决',
-        status: 'Success',
-        disabled: true,
-      },
-      processing: {
-        text: '解决中',
-        status: 'Processing',
-      },
-    },
+    title: '手机号',
+    dataIndex: 'phone',
+    ellipsis: true,
   },
   {
-    title: '标签',
-    dataIndex: 'labels',
-    search: false,
-    renderFormItem: (_, { defaultRender }) => {
-      return defaultRender(_);
-    },
-    render: (_, record) => (
-      <Space>
-        {record.labels.map(({ name, color }) => (
-          <Tag color={color} key={name}>
-            {name}
-          </Tag>
-        ))}
-      </Space>
-    ),
+    title: '账号',
+    dataIndex: 'account',
+    ellipsis: true,
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createDate',
+    ellipsis: true,
+    hideInSearch: true,
   },
 ];
 
 const pageConfig: PageContainerProps = {
-  title: '标准页面',
+  title: '用户管理',
   breadcrumb: {
     routes: [
       {
         path: '',
-        breadcrumbName: '一级页面',
+        breadcrumbName: '系统管理',
       },
       {
         path: '',
-        breadcrumbName: '二级页面',
-      },
-      {
-        path: '',
-        breadcrumbName: '当前页面',
+        breadcrumbName: '用户管理',
       },
     ],
   },
-  content: '欢迎使用 ProLayout 组件',
+  content: '用户管理页面，用来管理平台用户。我们提供了 新增,修改,查询,删除,批量删除的功能，方便您对平台用户进行管理操作。',
 };
 
 const tConfig: Record<string, any> = {
@@ -145,7 +91,7 @@ const renderForm = (data: any) => {
 };
 
 const HomePage: React.FC = ({ children }) => {
-  return <GeneralPage<GithubIssueItem>
+  return <GeneralPage<UserData>
     prefix="组件"
     pageConfig={pageConfig}
     tableConfig={tConfig}

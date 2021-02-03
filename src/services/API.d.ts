@@ -19,17 +19,16 @@ declare namespace API {
     status?: 'ok' | 'error';
   }
 
-  export interface NoticeIconData {
-    id: string;
-    key: string;
-    avatar: string;
-    title: string;
-    datetime: string;
-    type: string;
-    read?: boolean;
-    description: string;
-    clickClose?: boolean;
-    extra: any;
-    status: string;
+  export interface GeneralData {
+    id: string
+    remark: string
+    createDate: string
+    updateDate: string
+    updateBy: string
+    createBy: string
+    sort: string
+    deleted: string
+    current: string
+    step: string
   }
 }

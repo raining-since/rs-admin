@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-import ProTable from '@ant-design/pro-table';
 import { GeneralEventType, GenralPageProps } from '@/components/GeneralPage/type';
 import { Button, Popconfirm, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons/lib';
 import BaseForm from '@/components/BaseForm';
+import BasePage from '@/components/BasePage';
 
 /*
 * 在 BasePage 基础之上添加标准的增删改查功能，标准化通用页面
@@ -83,7 +82,6 @@ function GeneralPage<T>(props: GenralPageProps<T>) {
     }
   }
 
-
   const tConfig: Record<string, any> = {
     rowKey: 'id',
     search: {
@@ -147,15 +145,13 @@ function GeneralPage<T>(props: GenralPageProps<T>) {
     },
   };
 
+  return <BasePage<T>
+    pageConfig={props.pageConfig}
+    tableConfig={Object.assign(props.tableConfig, tConfig)}
+    looper={props.looper}
+  >
 
-  return <PageContainer
-    {...props.pageConfig}>
-    <ProTable<T>
-      {...tConfig}
-      {...props.tableConfig}
-    />
-    {props.children}
-  </PageContainer>;
+  </BasePage>;
 }
 
 export default GeneralPage;

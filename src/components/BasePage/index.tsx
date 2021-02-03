@@ -2,6 +2,7 @@ import React from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { BasePageProps } from '@/components/BasePage/type';
+import ProCard from '@ant-design/pro-card';
 
 /*
 * 基础页面
@@ -17,10 +18,12 @@ import { BasePageProps } from '@/components/BasePage/type';
 function BasePage<T>(props: BasePageProps<T>) {
   return <PageContainer
     {...props.pageConfig}>
-    <ProTable<T>
-      {...props.tableConfig}
-    />
-    {props.children}
+    <ProCard>
+      <ProTable<T>
+        {...props.tableConfig}
+      />
+      {props.children}
+    </ProCard>
   </PageContainer>;
 }
 
