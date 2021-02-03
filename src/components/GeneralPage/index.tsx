@@ -1,12 +1,10 @@
-import React, {useState} from 'react';
-import {PageContainer} from '@ant-design/pro-layout';
+import React, { useState } from 'react';
+import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
-import {GeneralEventType, GenralPageProps} from '@/components/GeneralPage/type';
-import {Button, Popconfirm, Space} from 'antd';
-import {PlusOutlined,} from '@ant-design/icons/lib';
-import {
-  ModalForm, DrawerForm
-} from '@ant-design/pro-form';
+import { GeneralEventType, GenralPageProps } from '@/components/GeneralPage/type';
+import { Button, Popconfirm, Space } from 'antd';
+import { PlusOutlined } from '@ant-design/icons/lib';
+import BaseForm from '@/components/BaseForm';
 
 /*
 * 在 BasePage 基础之上添加标准的增删改查功能，标准化通用页面
@@ -39,6 +37,52 @@ function GeneralPage<T>(props: GenralPageProps<T>) {
 
   const [selectRows, setSelectRows] = useState([]);
 
+  if (props.isOptions) {
+    let isExit = props.tableConfig.columns.find((item: any) => {
+      return item.valueType === 'option';
+    });
+    if (!isExit) {
+      props.tableConfig.columns.push({
+        title: '操作',
+        valueType: 'option',
+        render: (text: string, record: any, _: any, action: any) => [
+          <BaseForm<T>
+            key="modeify"
+            title={`修改${props.prefix}`}
+            type="modal"
+            dataSource={record}
+            triggerRender={
+              <Button
+                type="link"
+              >
+                修改
+              </Button>
+            }
+            onFinish={data => {
+              return props.looper.looper(GeneralEventType.UPDATE, data);
+            }}
+          >
+            {props.formRender ? props.formRender(record) : ''}
+          </BaseForm>
+          ,
+          <Popconfirm
+            title="确定删除所选项吗？"
+            okText="删除"
+            key="delete"
+            onConfirm={() => props.looper.looper(GeneralEventType.DELETE, record.id)}
+            cancelText="取消">
+            <Button danger
+                    type="link"
+                    style={{ marginLeft: '20px' }}
+            >
+              删除
+            </Button>
+          </Popconfirm>,
+        ],
+      });
+    }
+  }
+
 
   const tConfig: Record<string, any> = {
     rowKey: 'id',
@@ -51,51 +95,36 @@ function GeneralPage<T>(props: GenralPageProps<T>) {
     headerTitle: '',
     dateFormatter: 'string',
     toolBarRender: () => {
-      return props.formType === 'Model' ? <ModalForm<T>
+      return <BaseForm<T>
         title={`新建${props.prefix}`}
-        trigger={
-          <Button type="primary">
+        type="modal"
+        triggerRender={
+          <Button>
             <PlusOutlined/>
-            新建
+            新增
           </Button>
         }
-        onFinish={async (values) => {
-          await props.looper.looper(GeneralEventType.ADD, values)
-          return true;
+        onFinish={data => {
+          props.looper.looper(GeneralEventType.ADD, data);
         }}
       >
-        {props.formRender ? props.formRender() : ""}
-      </ModalForm> : <DrawerForm<T>
-        title={`新建${props.prefix}`}
-        trigger={
-          <Button type="primary">
-            <PlusOutlined/>
-            新建
-          </Button>
-        }
-        onFinish={async (values) => {
-          await props.looper.looper(GeneralEventType.ADD, values)
-          return true;
-        }}
-      >
-        {props.formRender ? props.formRender() : ""}
-
-      </DrawerForm>
+        {props.formRender ? props.formRender() : ''}
+      </BaseForm>;
     },
     rowSelection: {
       onChange: (selectedRowKeys: any) => {
-        setSelectRows(selectedRowKeys)
+        setSelectRows(selectedRowKeys);
       },
     },
-    tableAlertRender: ({selectedRowKeys, selectedRows, onCleanSelected}: any) => {
+    tableAlertRender: ({ selectedRowKeys, selectedRows, onCleanSelected }: any) => {
       return <Space size={24}>
-                <span>已选{selectedRowKeys.length}项
-                  <a style={{marginLeft: 8}}
-                     onClick={onCleanSelected}>
-                    取消选择
-                  </a>
-                </span>
-      </Space>
+      <span>已选{selectedRowKeys.length}项
+      <a style={{ marginLeft: 8 }}
+         onClick={onCleanSelected}>
+      取消选择
+      </a>
+      </span>
+      </Space>;
     },
     tableAlertOptionRender: () => {
       return (
@@ -106,7 +135,7 @@ function GeneralPage<T>(props: GenralPageProps<T>) {
           cancelText="取消">
           <Button danger
                   type="link"
-                  style={{marginLeft: '20px'}}
+                  style={{ marginLeft: '20px' }}
           >
             删除选择
           </Button>
@@ -115,7 +144,7 @@ function GeneralPage<T>(props: GenralPageProps<T>) {
     },
     request: async (params: any) => {
       return props.looper.looper(GeneralEventType.SEARCH, params);
-    }
+    },
   };
 
 
