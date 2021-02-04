@@ -82,7 +82,7 @@ const renderForm = (data: any) => {
       width="md"
       name="name"
       label="签约客户名称"
-      initialValue={data ? data.id : ''}
+      initialValue={data ? data.name : ''}
       tooltip="最长为 24 位"
       placeholder="请输入名称"
     />

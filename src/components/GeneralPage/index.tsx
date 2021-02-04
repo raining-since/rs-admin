@@ -4,6 +4,7 @@ import { Button, Popconfirm, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons/lib';
 import BaseForm from '@/components/BaseForm';
 import BasePage from '@/components/BasePage';
+import { Access, useAccess } from 'umi';
 
 /*
 * 在 BasePage 基础之上添加标准的增删改查功能，标准化通用页面
@@ -35,6 +36,7 @@ import BasePage from '@/components/BasePage';
 function GeneralPage<T>(props: GenralPageProps<T>) {
 
   const [selectRows, setSelectRows] = useState([]);
+  const access = useAccess();
 
   if (props.isOptions) {
     let isExit = props.tableConfig.columns.find((item: any) => {
@@ -64,19 +66,24 @@ function GeneralPage<T>(props: GenralPageProps<T>) {
             {props.formRender ? props.formRender(record) : ''}
           </BaseForm>
           ,
-          <Popconfirm
-            title="确定删除所选项吗？"
-            okText="删除"
+          <Access
+            accessible={access.canShow}
+            fallback={''}
             key="delete"
-            onConfirm={() => props.looper.looper(GeneralEventType.DELETE, record.id)}
-            cancelText="取消">
-            <Button danger
-                    type="link"
-                    style={{ marginLeft: '20px' }}
-            >
-              删除
-            </Button>
-          </Popconfirm>,
+          >
+            <Popconfirm
+              title="确定删除所选项吗？"
+              okText="删除"
+              onConfirm={() => props.looper.looper(GeneralEventType.DELETE, record.id)}
+              cancelText="取消">
+              <Button danger
+                      type="link"
+                      style={{ marginLeft: '20px' }}
+              >
+                删除
+              </Button>
+            </Popconfirm>
+          </Access>,
         ],
       });
     }
@@ -88,7 +95,8 @@ function GeneralPage<T>(props: GenralPageProps<T>) {
       labelWidth: 'auto',
     },
     pagination: {
-      pageSize: 5,
+      pageSize: 10,
+      size: 'default',
     },
     headerTitle: '',
     dateFormatter: 'string',
@@ -97,7 +105,7 @@ function GeneralPage<T>(props: GenralPageProps<T>) {
         title={`新建${props.prefix}`}
         type="modal"
         triggerRender={
-          <Button>
+          <Button type="primary">
             <PlusOutlined/>
             新增
           </Button>

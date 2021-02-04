@@ -12,6 +12,9 @@ export default defineConfig({
   dynamicImport: {
     loading: '@ant-design/pro-layout/es/PageLoading',
   },
+  locale: {
+    default: 'zh-CN',
+  },
   targets: {
     ie: 11,
   },

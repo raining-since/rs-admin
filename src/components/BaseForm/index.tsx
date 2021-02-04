@@ -1,6 +1,7 @@
 import React from 'react';
 import { BaseFormPorps } from '@/components/BaseForm/type';
 import { DrawerForm, ModalForm } from '@ant-design/pro-form';
+import { message } from 'antd';
 
 function BaseForm<T>(props: BaseFormPorps<T>) {
   return (
@@ -10,7 +11,9 @@ function BaseForm<T>(props: BaseFormPorps<T>) {
         props.triggerRender
       }
       onFinish={async (values) => {
-        await props.onFinish(values);
+        let resp = await props.onFinish(values);
+        console.log(resp);
+        message.info('操作成功！');
         return true;
       }}
     >
@@ -22,6 +25,7 @@ function BaseForm<T>(props: BaseFormPorps<T>) {
       }
       onFinish={async (values) => {
         await props.onFinish(values);
+        message.info('操作成功！');
         return true;
       }}
     >
